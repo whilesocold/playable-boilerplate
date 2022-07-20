@@ -160,7 +160,15 @@ export class App3d extends App {
 
         switch (type) {
             case "three":
-                this._texture3dCache.set(name, await textureLoader.loadAsync(image.src));
+                const texture = await textureLoader.loadAsync(image.src);
+
+                texture.magFilter = THREE.NearestFilter;
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.flipY = false;
+                texture.encoding = THREE.sRGBEncoding;
+
+                this._texture3dCache.set(name, texture);
                 break;
         }
     }
