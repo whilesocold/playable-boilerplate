@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { App } from "./App";
+import { JoystickControls, RotationJoystickControls } from "three-joystick";
 
 export enum MeshMaterialType {
     LAMBERT,
@@ -20,6 +21,8 @@ export class App3d extends App {
     protected _rootGroup!: THREE.Group;
 
     protected _meshLoader!: GLTFLoader;
+
+    protected _joystick3d!: JoystickControls;
 
     protected _texture3dCache: Map<string, THREE.Texture> = new Map<string, THREE.Texture>();
 
@@ -56,6 +59,8 @@ export class App3d extends App {
         this._scene3d.add(this._rootGroup);
 
         this._meshLoader = new GLTFLoader();
+
+        this._joystick3d = new JoystickControls(this._camera3d, this._scene3d);
     }
 
     protected initRender(): void {
@@ -67,6 +72,7 @@ export class App3d extends App {
     protected onRender(): void {
         super.onRender();
 
+        this._joystick3d.update();
         this._renderer3d.render(this._scene3d, this._camera3d);
     }
 
@@ -184,5 +190,9 @@ export class App3d extends App {
 
     public getCamera(): THREE.Camera {
         return this._camera3d as THREE.Camera;
+    }
+
+    public getJoystick(): JoystickControls {
+        return this._joystick3d;
     }
 }
