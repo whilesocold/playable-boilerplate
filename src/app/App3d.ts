@@ -112,19 +112,17 @@ export class App3d extends App {
             this._meshLoader?.parse(
                 meshJsonStr,
                 "",
-                (gltf: GLTF) => {
-                    resolve(gltf.scene);
-                },
+                (gltf: GLTF) => resolve(gltf.scene),
                 (event: ErrorEvent) => reject(event),
             );
         });
     }
 
     public async createMeshFromConfig(name: string, meshesConfig: any): Promise<THREE.Group> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const meshConfig = meshesConfig.find((data: any) => data.name === name);
             if (meshConfig) {
-                return this.createMesh(JSON.stringify(meshConfig.data));
+                resolve(await this.createMesh(JSON.stringify(meshConfig.data)));
             } else {
                 reject();
             }
