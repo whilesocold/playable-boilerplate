@@ -1,7 +1,9 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
 import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Texture, utils } from "pixi.js";
+import { Joystick } from "@sflabs/pixi-joystick";
 
 import initRAF from "../utils/RAF";
+import { JoystickControls } from "three-joystick";
 
 export interface AssetConfig {
     name: string;
@@ -29,6 +31,8 @@ export class App extends utils.EventEmitter {
 
     protected _imageCache: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
     protected _texture2dCache: Map<string, Texture> = new Map<string, Texture>();
+
+    protected _joystick!: Joystick;
 
     constructor() {
         super();
@@ -68,8 +72,13 @@ export class App extends utils.EventEmitter {
         window.addEventListener("orientationchange", this.onOrientationChange);
     }
 
+    protected initJoystick(): void {
+        this._joystick = new Joystick(this._stage, { x: 0, y: 0 });
+    }
+
     protected initRender(): void {
         this.initPIXI();
+        this.initJoystick();
     }
 
     protected async initMRAID(): Promise<void> {
@@ -159,14 +168,6 @@ export class App extends utils.EventEmitter {
         });
     }
 
-    public getImage(name: string): HTMLImageElement | undefined {
-        return this._imageCache.get(name);
-    }
-
-    public getTexture2d(name: string): Texture | undefined {
-        return this._texture2dCache.get(name);
-    }
-
     protected onResize(): void {
         const { width, height } = this.getSize();
 
@@ -186,6 +187,14 @@ export class App extends utils.EventEmitter {
         this.onResize();
     };
 
+    public getImage(name: string): HTMLImageElement | undefined {
+        return this._imageCache.get(name);
+    }
+
+    public getTexture2d(name: string): Texture | undefined {
+        return this._texture2dCache.get(name);
+    }
+
     public getSize(): { width: number; height: number } {
         return { width: this.getWidth(), height: this.getHeight() };
     }
@@ -204,5 +213,9 @@ export class App extends utils.EventEmitter {
 
     public getStage(): Container {
         return this._stage;
+    }
+
+    public getJoystick(): Joystick {
+        return this._joystick;
     }
 }

@@ -23,8 +23,10 @@
     "author": "whilesocold",
     "license": "MIT",
     "dependencies": {
+        "@sflabs/pixi-joystick": "^6.0.3",
         "eventemitter3": "^4.0.7",
         "pixi.js": "^6.2.2",
+        "remove": "^0.1.5",
         "three": "^0.142.0",
         "three-joystick": "^1.0.2"
     },
