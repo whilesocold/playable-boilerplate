@@ -4,6 +4,14 @@ import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { nullable } from "../utils/types";
 import { App } from "./App";
 
+export enum MeshMaterialType {
+    LAMBERT,
+    STANDART,
+}
+
+export type MeshMaterialAny = THREE.MeshLambertMaterial | THREE.MeshStandardMaterial;
+export type MeshMaterialParametersAny = THREE.MeshLambertMaterialParameters | THREE.MeshStandardMaterialParameters;
+
 export class App3d extends App {
     protected _canvas3d: nullable<HTMLCanvasElement>;
     protected _renderer3d: nullable<THREE.WebGLRenderer>;
@@ -123,6 +131,22 @@ export class App3d extends App {
                 reject();
             }
         });
+    }
+
+    public createMaterial(
+        type: MeshMaterialType = MeshMaterialType.LAMBERT,
+        parameters: MeshMaterialParametersAny,
+    ): nullable<MeshMaterialAny> {
+        switch (type) {
+            case MeshMaterialType.LAMBERT:
+                return new THREE.MeshLambertMaterial(parameters);
+                break;
+
+            case MeshMaterialType.STANDART:
+                return new THREE.MeshStandardMaterial(parameters);
+                break;
+        }
+        return null;
     }
 
     public getRenderer3d(): nullable<THREE.WebGLRenderer> {
