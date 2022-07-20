@@ -1,5 +1,5 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
-import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Texture } from "pixi.js";
+import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Texture, utils } from "pixi.js";
 
 import initRAF from "../utils/RAF";
 
@@ -10,7 +10,12 @@ export interface AssetConfig {
 }
 export type AssetsConfig = AssetConfig[];
 
-export class App {
+export enum AppEvent {
+    RENDER = "AppEvent.RENDER",
+    RESIZE = "AppEvent.RESIZE",
+}
+
+export class App extends utils.EventEmitter {
     protected _canvas!: HTMLCanvasElement;
     protected _renderer!: AbstractRenderer;
     protected _stage!: Container;
@@ -25,6 +30,8 @@ export class App {
     protected _texture2dCache: Map<string, Texture> = new Map<string, Texture>();
 
     constructor() {
+        super();
+
         initRAF();
     }
 
@@ -97,6 +104,8 @@ export class App {
 
     protected onRender(): void {
         this._renderer.render(this._stage);
+
+        this.emit(AppEvent.RENDER);
     }
 
     public async load(images: AssetsConfig): Promise<void> {
@@ -163,13 +172,13 @@ export class App {
         const upscaleWidth = Math.ceil(1.5 * width);
         const upscaleHeight = Math.ceil(1.5 * height);
 
-        if (this._renderer) {
-            this._renderer.view.style.width = width + "px";
-            this._renderer.view.style.height = height + "px";
-            this._renderer.view.width = upscaleWidth;
-            this._renderer.view.height = upscaleHeight;
-            this._renderer.resize(upscaleWidth, upscaleHeight);
-        }
+        this._renderer.view.style.width = width + "px";
+        this._renderer.view.style.height = height + "px";
+        this._renderer.view.width = upscaleWidth;
+        this._renderer.view.height = upscaleHeight;
+        this._renderer.resize(upscaleWidth, upscaleHeight);
+
+        this.emit(AppEvent.RESIZE, width, height);
     }
 
     protected onOrientationChange = (): void => {
