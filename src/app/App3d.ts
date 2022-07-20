@@ -110,10 +110,10 @@ export class App3d extends App {
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
         return new Promise((resolve, reject) => {
             this._meshLoader.parse(
-                meshJsonStr,
-                "",
-                (gltf: GLTF) => resolve(gltf.scene),
-                (event: ErrorEvent) => reject(event),
+              meshJsonStr,
+              "",
+              (gltf: GLTF) => resolve(gltf.scene),
+              (event: ErrorEvent) => reject(event),
             );
         });
     }
@@ -130,9 +130,9 @@ export class App3d extends App {
     }
 
     public createMaterial<T extends MeshLambertMaterialParameters | MeshStandartMaterialParameters>(
-        type: MeshMaterialType = MeshMaterialType.LAMBERT,
-        parameters: T,
-    ): MeshMaterialAny | undefined {
+      type: MeshMaterialType = MeshMaterialType.LAMBERT,
+      parameters: T,
+    ): MeshMaterialAny {
         switch (type) {
             case MeshMaterialType.LAMBERT:
                 return new THREE.MeshLambertMaterial(parameters);
@@ -142,7 +142,8 @@ export class App3d extends App {
                 return new THREE.MeshStandardMaterial(parameters);
                 break;
         }
-        return undefined;
+
+        return new THREE.MeshStandardMaterial(parameters);
     }
 
     protected async loadTextureFromImage(name: string, type: string, image: HTMLImageElement): Promise<void> {
