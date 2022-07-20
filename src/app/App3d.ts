@@ -82,7 +82,7 @@ export class App3d extends App {
         }
     }
 
-    public addSunLight(color = 0xffffff, intensity = 0.5, castShadow = true): THREE.DirectionalLight {
+    public createSunLight(color = 0xffffff, intensity = 0.5, castShadow = true): THREE.DirectionalLight {
         const sunLight = new THREE.DirectionalLight(color, intensity);
 
         sunLight.position.set(10, 30, 5);
