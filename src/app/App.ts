@@ -1,12 +1,13 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
 import { nullable } from "../utils/types";
-import { AbstractRenderer, Application, autoDetectRenderer, Container, Renderer } from "pixi.js";
+import { AbstractRenderer, Application, autoDetectRenderer, Container, Renderer, Texture } from "pixi.js";
 
 import initRAF from "../utils/RAF";
 
 export interface AssetConfig {
     name: string;
     data: string;
+    type?: string;
 }
 export type AssetsConfig = AssetConfig[];
 
@@ -22,6 +23,7 @@ export class App {
     protected _tickPrevious = 0;
 
     protected _imageCache: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
+    protected _texture2dCache: Map<string, Texture> = new Map<string, Texture>();
 
     constructor() {
         initRAF();
@@ -104,31 +106,42 @@ export class App {
         await this.loadImages(images);
     }
 
+    protected async loadTextureFromImage(
+        name: string,
+        type: string | undefined,
+        image: HTMLImageElement,
+    ): Promise<void> {}
+
     protected async loadImages(images: AssetsConfig): Promise<void> {
         return new Promise((resolve) => {
             let loadIndex = 0;
             const loadTotalIndex = images.length;
 
-            const onLoad = (name: string, image: HTMLImageElement | null) => {
+            const onLoad = async (
+                name: string,
+                type: string | undefined,
+                image: HTMLImageElement | null,
+            ): Promise<void> => {
                 if (++loadIndex === loadTotalIndex) {
                     if (image) {
                         this._imageCache.set(name, image);
+                        await this.loadTextureFromImage(name, type, image);
                     }
                     resolve();
                 }
             };
 
             for (let i = 0; i < loadTotalIndex; i++) {
-                const { name, data } = images[i];
+                const { name, data, type } = images[i];
 
                 const image = new Image();
 
-                image.onload = () => {
-                    onLoad(name, image);
+                image.onload = async () => {
+                    await onLoad(name, type, image);
                     console.log(`App::loadImages() Loading success ${name}`);
                 };
                 image.onerror = () => {
-                    onLoad(name, null);
+                    onLoad(name, type, null);
                     console.error(`App::loadImages() Loading error ${name}`);
                 };
                 image.src = data;
@@ -138,6 +151,10 @@ export class App {
 
     public getImage(name: string): nullable<HTMLImageElement> {
         return this._imageCache.get(name);
+    }
+
+    public getTexture2d(name: string): nullable<Texture> {
+        return this._texture2dCache.get(name);
     }
 
     protected onResize(): void {

@@ -3,6 +3,7 @@ import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 import { nullable } from "../utils/types";
 import { App } from "./App";
+import { Texture } from "pixi.js";
 
 export enum MeshMaterialType {
     LAMBERT,
@@ -22,6 +23,8 @@ export class App3d extends App {
     protected _rootGroup: nullable<THREE.Group>;
 
     protected _meshLoader: nullable<GLTFLoader>;
+
+    protected _texture3dCache: Map<string, THREE.Texture> = new Map<string, THREE.Texture>();
 
     protected initTHREE(): void {
         const { width, height } = this.getSize();
@@ -148,6 +151,22 @@ export class App3d extends App {
                 break;
         }
         return null;
+    }
+
+    protected async loadTextureFromImage(name: string, type: string, image: HTMLImageElement): Promise<void> {
+        await super.loadTextureFromImage(name, type, image);
+
+        const textureLoader = new THREE.TextureLoader();
+
+        switch (type) {
+            case "three":
+                this._texture3dCache.set(name, await textureLoader.loadAsync(image.src));
+                break;
+        }
+    }
+
+    public getTexture3d(name: string): nullable<THREE.Texture> {
+        return this._texture3dCache.get(name);
     }
 
     public getRenderer3d(): nullable<THREE.WebGLRenderer> {
