@@ -1,9 +1,8 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
-import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Texture, utils } from "pixi.js";
-import { Joystick } from "@sflabs/pixi-joystick";
+import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Sprite, Texture, utils } from "pixi.js";
+import { Joystick } from "pixi-virtual-joystick";
 
 import initRAF from "../utils/RAF";
-import { JoystickControls } from "three-joystick";
 
 export interface AssetConfig {
     name: string;
@@ -15,7 +14,9 @@ export type AssetsConfig = AssetConfig[];
 export enum AppEvent {
     RENDER = "AppEvent.RENDER",
     RESIZE = "AppEvent.RESIZE",
-    JOYSTICK = "AppEvent.JOYSTICK",
+    JOYSTICK_CHANGE = "AppEvent.JOYSTICK_CHANGE",
+    JOYSTICK_START = "AppEvent.JOYSTICK_START",
+    JOYSTICK_END = "AppEvent.JOYSTICK_END",
 }
 
 export class App extends utils.EventEmitter {
@@ -73,7 +74,21 @@ export class App extends utils.EventEmitter {
     }
 
     protected initJoystick(): void {
-        this._joystick = new Joystick(this._stage, { x: 0, y: 0 });
+        this._joystick = new Joystick({
+            outerScale: { x: 0.5, y: 0.5 },
+            innerScale: { x: 0.8, y: 0.8 },
+
+            onChange: ({ angle, direction, power }) => {
+                this.emit(AppEvent.JOYSTICK_CHANGE, { angle, direction, power });
+            },
+            onStart: () => {
+                this.emit(AppEvent.JOYSTICK_START);
+            },
+            onEnd: () => {
+                this.emit(AppEvent.JOYSTICK_END);
+            },
+        });
+        this._stage.addChild(this._joystick);
     }
 
     protected initRender(): void {
