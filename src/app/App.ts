@@ -4,6 +4,12 @@ import { AbstractRenderer, Application, autoDetectRenderer, Container, Renderer 
 
 import initRAF from "../utils/RAF";
 
+export interface AssetConfig {
+    name: string;
+    data: string;
+}
+export type AssetsConfig = AssetConfig[];
+
 export class App {
     protected _canvas: nullable<HTMLCanvasElement>;
     protected _renderer: nullable<AbstractRenderer>;
@@ -92,9 +98,36 @@ export class App {
         }
     }
 
-    public load(): Promise<void> {
+    public async load(images: AssetsConfig): Promise<void> {
+        await this.loadImages(images);
+    }
+
+    protected async loadImages(images: AssetsConfig): Promise<void> {
         return new Promise((resolve) => {
-            resolve();
+            let loadIndex = 0;
+            const loadTotalIndex = images.length;
+
+            const onLoad = () => {
+                if (++loadIndex === loadTotalIndex) {
+                    resolve();
+                }
+            };
+
+            for (let i = 0; i < loadTotalIndex; i++) {
+                const { name, data } = images[i];
+
+                const image = new Image();
+
+                image.onload = () => {
+                    onLoad();
+                    console.log(`App::loadImages() Loading success ${name}`);
+                };
+                image.onerror = () => {
+                    onLoad();
+                    console.error(`App::loadImages() Loading error ${name}`);
+                };
+                image.src = data;
+            }
         });
     }
 

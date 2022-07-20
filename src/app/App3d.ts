@@ -10,7 +10,8 @@ export enum MeshMaterialType {
 }
 
 export type MeshMaterialAny = THREE.MeshLambertMaterial | THREE.MeshStandardMaterial;
-export type MeshMaterialParametersAny = THREE.MeshLambertMaterialParameters | THREE.MeshStandardMaterialParameters;
+export type MeshLambertMaterialParameters = THREE.MeshLambertMaterialParameters;
+export type MeshStandartMaterialParameters = THREE.MeshStandardMaterialParameters;
 
 export class App3d extends App {
     protected _canvas3d: nullable<HTMLCanvasElement>;
@@ -114,10 +115,10 @@ export class App3d extends App {
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
         return new Promise((resolve, reject) => {
             this._meshLoader?.parse(
-                meshJsonStr,
-                "",
-                (gltf: GLTF) => resolve(gltf.scene),
-                (event: ErrorEvent) => reject(event),
+              meshJsonStr,
+              "",
+              (gltf: GLTF) => resolve(gltf.scene),
+              (event: ErrorEvent) => reject(event),
             );
         });
     }
@@ -133,9 +134,9 @@ export class App3d extends App {
         });
     }
 
-    public createMaterial(
-        type: MeshMaterialType = MeshMaterialType.LAMBERT,
-        parameters: MeshMaterialParametersAny,
+    public createMaterial<T extends MeshLambertMaterialParameters | MeshStandartMaterialParameters>(
+      type: MeshMaterialType = MeshMaterialType.LAMBERT,
+      parameters: T,
     ): nullable<MeshMaterialAny> {
         switch (type) {
             case MeshMaterialType.LAMBERT:
