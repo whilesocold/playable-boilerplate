@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 import { nullable } from "../utils/types";
 import { App } from "./App";
@@ -8,7 +9,10 @@ export class App3d extends App {
     protected _renderer3d: nullable<THREE.WebGLRenderer>;
     protected _camera3d: nullable<THREE.PerspectiveCamera>;
     protected _scene3d: nullable<THREE.Scene>;
+
     protected _rootGroup: nullable<THREE.Group>;
+
+    protected _meshLoader: nullable<GLTFLoader>;
 
     protected initTHREE(): void {
         const { width, height } = this.getSize();
@@ -41,6 +45,8 @@ export class App3d extends App {
 
         this._rootGroup = new THREE.Group();
         this._scene3d.add(this._rootGroup);
+
+        this._meshLoader = new GLTFLoader();
     }
 
     protected initRender(): void {
@@ -74,6 +80,50 @@ export class App3d extends App {
             this._canvas3d.width = 1.5 * width;
             this._canvas3d.height = 1.5 * height;
         }
+    }
+
+    public addSunLight(color = 0xffffff, intensity = 0.5, castShadow = true): THREE.DirectionalLight {
+        const sunLight = new THREE.DirectionalLight(color, intensity);
+        this._rootGroup?.add(sunLight);
+
+        sunLight.position.set(10, 30, 5);
+        sunLight.castShadow = castShadow;
+
+        sunLight.shadow.camera.left = -5;
+        sunLight.shadow.camera.right = 5;
+        sunLight.shadow.camera.top = 5;
+        sunLight.shadow.camera.bottom = -5;
+
+        sunLight.shadow.mapSize.width = 1024;
+        sunLight.shadow.mapSize.height = 1024;
+
+        return sunLight;
+    }
+
+    public addAmbientLight(color = 0xffffff, intensity = 1): THREE.AmbientLight {
+        const ambientLight = new THREE.AmbientLight(color, intensity);
+        this._rootGroup?.add(ambientLight);
+
+        return ambientLight;
+    }
+
+    public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
+        return new Promise((resolve) => {
+            this._meshLoader?.parse(meshJsonStr, "", (gltf: GLTF) => {
+                resolve(gltf.scene);
+            });
+        });
+    }
+
+    public async createMeshFromConfig(name: string, meshesConfig: any): Promise<THREE.Group> {
+        return new Promise((resolve, reject) => {
+            const meshConfig = meshesConfig.find((data: any) => data.name === name);
+            if (meshConfig) {
+                return this.createMesh(JSON.stringify(meshConfig.data));
+            } else {
+                reject();
+            }
+        });
     }
 
     public getRenderer3d(): nullable<THREE.WebGLRenderer> {
