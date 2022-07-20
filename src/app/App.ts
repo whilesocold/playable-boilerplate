@@ -21,6 +21,8 @@ export class App {
     protected _tickCurrent = 0;
     protected _tickPrevious = 0;
 
+    protected _imageCache: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
+
     constructor() {
         initRAF();
     }
@@ -107,8 +109,11 @@ export class App {
             let loadIndex = 0;
             const loadTotalIndex = images.length;
 
-            const onLoad = () => {
+            const onLoad = (name: string, image: HTMLImageElement | null) => {
                 if (++loadIndex === loadTotalIndex) {
+                    if (image) {
+                        this._imageCache.set(name, image);
+                    }
                     resolve();
                 }
             };
@@ -119,16 +124,20 @@ export class App {
                 const image = new Image();
 
                 image.onload = () => {
-                    onLoad();
+                    onLoad(name, image);
                     console.log(`App::loadImages() Loading success ${name}`);
                 };
                 image.onerror = () => {
-                    onLoad();
+                    onLoad(name, null);
                     console.error(`App::loadImages() Loading error ${name}`);
                 };
                 image.src = data;
             }
         });
+    }
+
+    public getImage(name: string): nullable<HTMLImageElement> {
+        return this._imageCache.get(name);
     }
 
     protected onResize(): void {
