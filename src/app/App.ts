@@ -1,6 +1,5 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
-import { nullable } from "../utils/types";
-import { AbstractRenderer, Application, autoDetectRenderer, Container, Renderer, Texture } from "pixi.js";
+import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Texture } from "pixi.js";
 
 import initRAF from "../utils/RAF";
 
@@ -12,11 +11,11 @@ export interface AssetConfig {
 export type AssetsConfig = AssetConfig[];
 
 export class App {
-    protected _canvas: nullable<HTMLCanvasElement>;
-    protected _renderer: nullable<AbstractRenderer>;
-    protected _stage: nullable<Container>;
+    protected _canvas!: HTMLCanvasElement;
+    protected _renderer!: AbstractRenderer;
+    protected _stage!: Container;
 
-    protected _mraid: nullable<MRAID>;
+    protected _mraid!: MRAID;
 
     protected _renderHandler = -1;
     protected _tickCurrent = 0;
@@ -97,9 +96,7 @@ export class App {
     };
 
     protected onRender(): void {
-        if (this._stage) {
-            this._renderer?.render(this._stage);
-        }
+        this._renderer.render(this._stage);
     }
 
     public async load(images: AssetsConfig): Promise<void> {
@@ -107,10 +104,12 @@ export class App {
     }
 
     protected async loadTextureFromImage(
-      name: string,
-      type: string | undefined,
-      image: HTMLImageElement,
-    ): Promise<void> {}
+        name: string,
+        type: string | undefined,
+        image: HTMLImageElement,
+    ): Promise<void> {
+        // TODO: PIXI texture creation
+    }
 
     protected async loadImages(images: AssetsConfig): Promise<void> {
         return new Promise((resolve) => {
@@ -118,9 +117,9 @@ export class App {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-              name: string,
-              type: string | undefined,
-              image: HTMLImageElement | null,
+                name: string,
+                type: string | undefined,
+                image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
@@ -150,11 +149,11 @@ export class App {
         });
     }
 
-    public getImage(name: string): nullable<HTMLImageElement> {
+    public getImage(name: string): HTMLImageElement | undefined {
         return this._imageCache.get(name);
     }
 
-    public getTexture2d(name: string): nullable<Texture> {
+    public getTexture2d(name: string): Texture | undefined {
         return this._texture2dCache.get(name);
     }
 
@@ -189,11 +188,11 @@ export class App {
         return Math.ceil(window.innerHeight);
     }
 
-    public getRenderer(): nullable<AbstractRenderer> {
+    public getRenderer(): AbstractRenderer {
         return this._renderer;
     }
 
-    public getStage(): nullable<Container> {
+    public getStage(): Container {
         return this._stage;
     }
 }

@@ -1,9 +1,6 @@
 import * as THREE from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-
-import { nullable } from "../utils/types";
 import { App } from "./App";
-import { Texture } from "pixi.js";
 
 export enum MeshMaterialType {
     LAMBERT,
@@ -15,14 +12,14 @@ export type MeshLambertMaterialParameters = THREE.MeshLambertMaterialParameters;
 export type MeshStandartMaterialParameters = THREE.MeshStandardMaterialParameters;
 
 export class App3d extends App {
-    protected _canvas3d: nullable<HTMLCanvasElement>;
-    protected _renderer3d: nullable<THREE.WebGLRenderer>;
-    protected _camera3d: nullable<THREE.PerspectiveCamera>;
-    protected _scene3d: nullable<THREE.Scene>;
+    protected _canvas3d!: HTMLCanvasElement;
 
-    protected _rootGroup: nullable<THREE.Group>;
+    protected _renderer3d!: THREE.WebGLRenderer;
+    protected _camera3d!: THREE.PerspectiveCamera;
+    protected _scene3d!: THREE.Scene;
+    protected _rootGroup!: THREE.Group;
 
-    protected _meshLoader: nullable<GLTFLoader>;
+    protected _meshLoader!: GLTFLoader;
 
     protected _texture3dCache: Map<string, THREE.Texture> = new Map<string, THREE.Texture>();
 
@@ -68,9 +65,8 @@ export class App3d extends App {
     }
 
     protected onRender(): void {
-        if (this._scene3d && this._camera3d) {
-            this._renderer3d?.render(this._scene3d, this._camera3d);
-        }
+        this._renderer3d.render(this._scene3d, this._camera3d);
+
         super.onRender();
     }
 
@@ -79,19 +75,15 @@ export class App3d extends App {
 
         const { width, height } = this.getSize();
 
-        if (this._camera3d) {
-            this._camera3d.aspect = window.innerWidth / window.innerHeight;
-            this._camera3d.updateProjectionMatrix();
-        }
+        this._camera3d.aspect = window.innerWidth / window.innerHeight;
+        this._camera3d.updateProjectionMatrix();
 
-        this._renderer3d?.setSize(1.5 * width, 1.5 * height);
+        this._renderer3d.setSize(1.5 * width, 1.5 * height);
 
-        if (this._canvas3d) {
-            this._canvas3d.style.width = width + "px";
-            this._canvas3d.style.height = height + "px";
-            this._canvas3d.width = 1.5 * width;
-            this._canvas3d.height = 1.5 * height;
-        }
+        this._canvas3d.style.width = width + "px";
+        this._canvas3d.style.height = height + "px";
+        this._canvas3d.width = 1.5 * width;
+        this._canvas3d.height = 1.5 * height;
     }
 
     public createSunLight(color = 0xffffff, intensity = 0.8, castShadow = true): THREE.DirectionalLight {
@@ -117,11 +109,11 @@ export class App3d extends App {
 
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
         return new Promise((resolve, reject) => {
-            this._meshLoader?.parse(
-              meshJsonStr,
-              "",
-              (gltf: GLTF) => resolve(gltf.scene),
-              (event: ErrorEvent) => reject(event),
+            this._meshLoader.parse(
+                meshJsonStr,
+                "",
+                (gltf: GLTF) => resolve(gltf.scene),
+                (event: ErrorEvent) => reject(event),
             );
         });
     }
@@ -138,9 +130,9 @@ export class App3d extends App {
     }
 
     public createMaterial<T extends MeshLambertMaterialParameters | MeshStandartMaterialParameters>(
-      type: MeshMaterialType = MeshMaterialType.LAMBERT,
-      parameters: T,
-    ): nullable<MeshMaterialAny> {
+        type: MeshMaterialType = MeshMaterialType.LAMBERT,
+        parameters: T,
+    ): MeshMaterialAny | undefined {
         switch (type) {
             case MeshMaterialType.LAMBERT:
                 return new THREE.MeshLambertMaterial(parameters);
@@ -150,7 +142,7 @@ export class App3d extends App {
                 return new THREE.MeshStandardMaterial(parameters);
                 break;
         }
-        return null;
+        return undefined;
     }
 
     protected async loadTextureFromImage(name: string, type: string, image: HTMLImageElement): Promise<void> {
@@ -173,23 +165,23 @@ export class App3d extends App {
         }
     }
 
-    public getTexture3d(name: string): nullable<THREE.Texture> {
+    public getTexture3d(name: string): THREE.Texture | undefined {
         return this._texture3dCache.get(name);
     }
 
-    public getRenderer3d(): nullable<THREE.WebGLRenderer> {
+    public getRenderer3d(): THREE.WebGLRenderer {
         return this._renderer3d;
     }
 
-    public getScene(): nullable<THREE.Scene> {
+    public getScene(): THREE.Scene {
         return this._scene3d;
     }
 
-    public getRootGroup(): nullable<THREE.Group> {
+    public getRootGroup(): THREE.Group {
         return this._rootGroup;
     }
 
-    public getCamera(): nullable<THREE.Camera> {
+    public getCamera(): THREE.Camera {
         return this._camera3d as THREE.Camera;
     }
 }
