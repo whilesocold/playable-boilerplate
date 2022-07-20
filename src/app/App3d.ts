@@ -84,7 +84,6 @@ export class App3d extends App {
 
     public addSunLight(color = 0xffffff, intensity = 0.5, castShadow = true): THREE.DirectionalLight {
         const sunLight = new THREE.DirectionalLight(color, intensity);
-        this._rootGroup?.add(sunLight);
 
         sunLight.position.set(10, 30, 5);
         sunLight.castShadow = castShadow;
@@ -100,11 +99,8 @@ export class App3d extends App {
         return sunLight;
     }
 
-    public addAmbientLight(color = 0xffffff, intensity = 1): THREE.AmbientLight {
-        const ambientLight = new THREE.AmbientLight(color, intensity);
-        this._rootGroup?.add(ambientLight);
-
-        return ambientLight;
+    public createAmbientLight(color = 0xffffff, intensity = 1): THREE.AmbientLight {
+        return new THREE.AmbientLight(color, intensity);
     }
 
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
