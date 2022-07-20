@@ -107,9 +107,9 @@ export class App {
     }
 
     protected async loadTextureFromImage(
-        name: string,
-        type: string | undefined,
-        image: HTMLImageElement,
+      name: string,
+      type: string | undefined,
+      image: HTMLImageElement,
     ): Promise<void> {}
 
     protected async loadImages(images: AssetsConfig): Promise<void> {
@@ -118,15 +118,16 @@ export class App {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-                name: string,
-                type: string | undefined,
-                image: HTMLImageElement | null,
+              name: string,
+              type: string | undefined,
+              image: HTMLImageElement | null,
             ): Promise<void> => {
+                if (image) {
+                    this._imageCache.set(name, image);
+                    await this.loadTextureFromImage(name, type, image);
+                }
+
                 if (++loadIndex === loadTotalIndex) {
-                    if (image) {
-                        this._imageCache.set(name, image);
-                        await this.loadTextureFromImage(name, type, image);
-                    }
                     resolve();
                 }
             };
