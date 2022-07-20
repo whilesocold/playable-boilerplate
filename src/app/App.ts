@@ -34,6 +34,7 @@ export class App extends utils.EventEmitter {
     protected _texture2dCache: Map<string, Texture> = new Map<string, Texture>();
 
     protected _joystick!: Joystick;
+    protected _stageHitArea!: Graphics;
 
     constructor() {
         super();
@@ -66,11 +67,18 @@ export class App extends utils.EventEmitter {
         });
 
         this._stage = new Container();
+        this._stage.interactive = true;
 
         document.getElementById("pixi")?.append(this._renderer.view);
 
         window.addEventListener("resize", this.onResize.bind(this));
         window.addEventListener("orientationchange", this.onOrientationChange);
+    }
+
+    protected initStageHitArea(): void {
+        this._stageHitArea = new Graphics();
+        this._stageHitArea.interactive = true;
+        this._stage.addChild(this._stageHitArea);
     }
 
     protected initJoystick(): void {
@@ -106,6 +114,7 @@ export class App extends utils.EventEmitter {
 
     protected initRender(): void {
         this.initPIXI();
+        this.initStageHitArea();
         this.initJoystick();
     }
 
@@ -151,9 +160,9 @@ export class App extends utils.EventEmitter {
     }
 
     protected async loadTextureFromImage(
-        name: string,
-        type: string | undefined,
-        image: HTMLImageElement,
+      name: string,
+      type: string | undefined,
+      image: HTMLImageElement,
     ): Promise<void> {
         // TODO: PIXI texture creation
     }
@@ -164,9 +173,9 @@ export class App extends utils.EventEmitter {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-                name: string,
-                type: string | undefined,
-                image: HTMLImageElement | null,
+              name: string,
+              type: string | undefined,
+              image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
@@ -207,6 +216,11 @@ export class App extends utils.EventEmitter {
         this._renderer.view.width = upscaleWidth;
         this._renderer.view.height = upscaleHeight;
         this._renderer.resize(upscaleWidth, upscaleHeight);
+
+        this._stageHitArea.clear();
+        this._stageHitArea.beginFill(0xff0000, 0.2);
+        this._stageHitArea.drawRect(0, 0, upscaleWidth, upscaleHeight);
+        this._stageHitArea.endFill();
 
         this.emit(AppEvent.RESIZE, width, height);
     }
