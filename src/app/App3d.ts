@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { App } from "./App";
-import { JoystickControls } from "three-joystick";
 
 export enum MeshMaterialType {
     LAMBERT,
