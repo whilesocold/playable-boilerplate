@@ -218,7 +218,7 @@ export class App extends utils.EventEmitter {
         this._renderer.resize(upscaleWidth, upscaleHeight);
 
         this._stageHitArea.clear();
-        this._stageHitArea.beginFill(0xff0000, 0.2);
+        this._stageHitArea.beginFill(0xffffff, 0.01);
         this._stageHitArea.drawRect(0, 0, upscaleWidth, upscaleHeight);
         this._stageHitArea.endFill();
 
