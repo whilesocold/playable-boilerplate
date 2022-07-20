@@ -72,7 +72,11 @@ export class App3d extends App {
     protected onRender(): void {
         super.onRender();
 
-        this._joystick3d.update((movement) => this.emit(AppEvent.JOYSTICK, movement));
+        this._joystick3d.update((movement) => {
+            if (movement) {
+                this.emit(AppEvent.JOYSTICK, movement);
+            }
+        });
         this._renderer3d.render(this._scene3d, this._camera3d);
     }
 
