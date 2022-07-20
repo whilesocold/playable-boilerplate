@@ -115,10 +115,10 @@ export class App3d extends App {
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
         return new Promise((resolve, reject) => {
             this._meshLoader?.parse(
-              meshJsonStr,
-              "",
-              (gltf: GLTF) => resolve(gltf.scene),
-              (event: ErrorEvent) => reject(event),
+                meshJsonStr,
+                "",
+                (gltf: GLTF) => resolve(gltf.scene),
+                (event: ErrorEvent) => reject(event),
             );
         });
     }
@@ -135,8 +135,8 @@ export class App3d extends App {
     }
 
     public createMaterial<T extends MeshLambertMaterialParameters | MeshStandartMaterialParameters>(
-      type: MeshMaterialType = MeshMaterialType.LAMBERT,
-      parameters: T,
+        type: MeshMaterialType = MeshMaterialType.LAMBERT,
+        parameters: T,
     ): nullable<MeshMaterialAny> {
         switch (type) {
             case MeshMaterialType.LAMBERT:
