@@ -13,6 +13,7 @@ export type AssetsConfig = AssetConfig[];
 export enum AppEvent {
     RENDER = "AppEvent.RENDER",
     RESIZE = "AppEvent.RESIZE",
+    JOYSTICK = "AppEvent.JOYSTICK",
 }
 
 export class App extends utils.EventEmitter {

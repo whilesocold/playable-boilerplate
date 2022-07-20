@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { App } from "./App";
+import { App, AppEvent } from "./App";
 import { JoystickControls, RotationJoystickControls } from "three-joystick";
 
 export enum MeshMaterialType {
@@ -72,7 +72,7 @@ export class App3d extends App {
     protected onRender(): void {
         super.onRender();
 
-        this._joystick3d.update();
+        this._joystick3d.update((movement) => this.emit(AppEvent.JOYSTICK, movement));
         this._renderer3d.render(this._scene3d, this._camera3d);
     }
 
