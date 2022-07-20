@@ -108,10 +108,15 @@ export class App3d extends App {
     }
 
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
-        return new Promise((resolve) => {
-            this._meshLoader?.parse(meshJsonStr, "", (gltf: GLTF) => {
-                resolve(gltf.scene);
-            });
+        return new Promise((resolve, reject) => {
+            this._meshLoader?.parse(
+                meshJsonStr,
+                "",
+                (gltf: GLTF) => {
+                    resolve(gltf.scene);
+                },
+                (event: ErrorEvent) => reject(event),
+            );
         });
     }
 
