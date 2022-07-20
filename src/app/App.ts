@@ -1,5 +1,5 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
-import { AbstractRenderer, autoDetectRenderer, Container, Renderer, Sprite, Texture, utils } from "pixi.js";
+import { AbstractRenderer, autoDetectRenderer, Container, Graphics, Renderer, Sprite, Texture, utils } from "pixi.js";
 import { Joystick } from "pixi-virtual-joystick";
 
 import initRAF from "../utils/RAF";
@@ -74,7 +74,20 @@ export class App extends utils.EventEmitter {
     }
 
     protected initJoystick(): void {
+        const outerGraphics = new Graphics();
+        outerGraphics.beginFill(0xffffff, 0.5);
+        outerGraphics.drawCircle(0, 0, 128);
+        outerGraphics.endFill();
+
+        const innerGraphics = new Graphics();
+        innerGraphics.beginFill(0xffffff, 0.9);
+        innerGraphics.drawCircle(0, 0, 32);
+        innerGraphics.endFill();
+
         this._joystick = new Joystick({
+            outer: outerGraphics,
+            inner: innerGraphics,
+
             outerScale: { x: 0.5, y: 0.5 },
             innerScale: { x: 0.8, y: 0.8 },
 
