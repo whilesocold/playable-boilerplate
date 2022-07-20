@@ -34,8 +34,8 @@ export class App3d extends App {
         this._canvas3d.height = height;
 
         this._camera3d = new THREE.PerspectiveCamera(45, width / height, 0.01, 1000);
-        this._camera3d.position.y = 160;
-        this._camera3d.position.z = 400;
+        this._camera3d.position.y = 5;
+        this._camera3d.position.z = 10;
         this._camera3d.lookAt(new THREE.Vector3(0, 0, 0));
 
         this._renderer3d = new THREE.WebGLRenderer({
@@ -94,10 +94,10 @@ export class App3d extends App {
         }
     }
 
-    public createSunLight(color = 0xffffff, intensity = 0.5, castShadow = true): THREE.DirectionalLight {
+    public createSunLight(color = 0xffffff, intensity = 0.8, castShadow = true): THREE.DirectionalLight {
         const sunLight = new THREE.DirectionalLight(color, intensity);
 
-        sunLight.position.set(10, 30, 5);
+        sunLight.position.set(30, 30, 10);
         sunLight.castShadow = castShadow;
 
         sunLight.shadow.camera.left = -5;
@@ -111,17 +111,17 @@ export class App3d extends App {
         return sunLight;
     }
 
-    public createAmbientLight(color = 0xffffff, intensity = 1): THREE.AmbientLight {
+    public createAmbientLight(color = 0xffffff, intensity = 0.5): THREE.AmbientLight {
         return new THREE.AmbientLight(color, intensity);
     }
 
     public async createMesh(meshJsonStr: string): Promise<THREE.Group> {
         return new Promise((resolve, reject) => {
             this._meshLoader?.parse(
-                meshJsonStr,
-                "",
-                (gltf: GLTF) => resolve(gltf.scene),
-                (event: ErrorEvent) => reject(event),
+              meshJsonStr,
+              "",
+              (gltf: GLTF) => resolve(gltf.scene),
+              (event: ErrorEvent) => reject(event),
             );
         });
     }
@@ -138,8 +138,8 @@ export class App3d extends App {
     }
 
     public createMaterial<T extends MeshLambertMaterialParameters | MeshStandartMaterialParameters>(
-        type: MeshMaterialType = MeshMaterialType.LAMBERT,
-        parameters: T,
+      type: MeshMaterialType = MeshMaterialType.LAMBERT,
+      parameters: T,
     ): nullable<MeshMaterialAny> {
         switch (type) {
             case MeshMaterialType.LAMBERT:
