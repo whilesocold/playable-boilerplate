@@ -3,6 +3,7 @@ import { AbstractRenderer, autoDetectRenderer, Container, Graphics, Renderer, Sp
 import { Joystick } from "pixi-virtual-joystick";
 
 import initRAF from "../utils/RAF";
+import { App3d } from "./App3d";
 
 export interface AssetConfig {
     name: string;
@@ -19,7 +20,11 @@ export enum AppEvent {
     JOYSTICK_END = "AppEvent.JOYSTICK_END",
 }
 
+export type AppAny = App | App3d;
+
 export class App extends utils.EventEmitter {
+    public static instance: AppAny;
+
     protected _canvas!: HTMLCanvasElement;
     protected _renderer!: AbstractRenderer;
     protected _stage!: Container;
@@ -38,6 +43,10 @@ export class App extends utils.EventEmitter {
 
     constructor() {
         super();
+
+        if (!App.instance) {
+            App.instance = this;
+        }
 
         initRAF();
     }
@@ -160,9 +169,9 @@ export class App extends utils.EventEmitter {
     }
 
     protected async loadTextureFromImage(
-      name: string,
-      type: string | undefined,
-      image: HTMLImageElement,
+        name: string,
+        type: string | undefined,
+        image: HTMLImageElement,
     ): Promise<void> {
         // TODO: PIXI texture creation
     }
@@ -173,9 +182,9 @@ export class App extends utils.EventEmitter {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-              name: string,
-              type: string | undefined,
-              image: HTMLImageElement | null,
+                name: string,
+                type: string | undefined,
+                image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
