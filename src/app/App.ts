@@ -199,9 +199,9 @@ export class App extends utils.EventEmitter {
     }
 
     protected async loadTextureFromImage(
-        name: string,
-        type: string | undefined,
-        image: HTMLImageElement,
+      name: string,
+      type: string | undefined,
+      image: HTMLImageElement,
     ): Promise<void> {
         switch (type) {
             case "pixi":
@@ -216,9 +216,9 @@ export class App extends utils.EventEmitter {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-                name: string,
-                type: string | undefined,
-                image: HTMLImageElement | null,
+              name: string,
+              type: string | undefined,
+              image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
@@ -266,16 +266,20 @@ export class App extends utils.EventEmitter {
 
     public async loadSounds(sounds: SoundsConfig): Promise<void> {
         return new Promise((resolve) => {
+            let loadCount = 0;
+
             for (let i = 0; i < sounds.length; i++) {
                 const sound = sounds[i];
+                const howl = new Howl({ src: [sound.data], autoplay: false, volume: sound.volume, loop: sound.loop });
 
-                this._soundCache.set(
-                    sound.name,
-                    new Howl({ src: [sound.data], volume: sound.volume, loop: sound.loop }),
-                );
+                this._soundCache.set(sound.name, howl);
+
+                howl.once("load", () => {
+                    if (++loadCount === sounds.length) {
+                        resolve();
+                    }
+                });
             }
-
-            resolve();
         });
     }
 
@@ -315,8 +319,10 @@ export class App extends utils.EventEmitter {
         const sounds = this._soundCache.get(name);
 
         if (sounds) {
-            sounds.play(name);
+            sounds.play();
         }
+
+        console.log(this._soundCache);
 
         return sounds;
     }
