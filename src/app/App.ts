@@ -3,6 +3,7 @@ import {
     AbstractRenderer,
     autoDetectRenderer,
     BaseTexture,
+    BitmapFont,
     Container,
     Graphics,
     Loader,
@@ -22,6 +23,17 @@ export interface AssetConfig {
     type?: string;
 }
 export type AssetsConfig = AssetConfig[];
+
+export interface FontsConfig {
+    images: {
+        name: string;
+        data: string;
+    }[];
+    atlases: {
+        name: string;
+        data: any;
+    }[];
+}
 
 export enum AppEvent {
     RENDER = "AppEvent.RENDER",
@@ -175,14 +187,10 @@ export class App extends utils.EventEmitter {
         this.emit(AppEvent.RENDER);
     }
 
-    public async load(images: AssetsConfig): Promise<void> {
-        await this.loadImages(images);
-    }
-
     protected async loadTextureFromImage(
-      name: string,
-      type: string | undefined,
-      image: HTMLImageElement,
+        name: string,
+        type: string | undefined,
+        image: HTMLImageElement,
     ): Promise<void> {
         switch (type) {
             case "pixi":
@@ -191,15 +199,15 @@ export class App extends utils.EventEmitter {
         }
     }
 
-    protected async loadImages(images: AssetsConfig): Promise<void> {
+    public async loadImages(images: AssetsConfig): Promise<void> {
         return new Promise((resolve) => {
             let loadIndex = 0;
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-              name: string,
-              type: string | undefined,
-              image: HTMLImageElement | null,
+                name: string,
+                type: string | undefined,
+                image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
@@ -226,6 +234,22 @@ export class App extends utils.EventEmitter {
                 };
                 image.src = data;
             }
+        });
+    }
+
+    public async loadFonts(fonts: FontsConfig): Promise<void> {
+        return new Promise(async (resolve) => {
+            await this.loadImages(fonts.images);
+
+            const atlases = fonts.atlases;
+
+            for (let i = 0; i < atlases.length; i++) {
+                const atlas = atlases[i];
+
+                BitmapFont.install(atlas.name, atlas.data);
+            }
+
+            resolve();
         });
     }
 
