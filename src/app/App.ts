@@ -16,6 +16,7 @@ import { Joystick } from "pixi-virtual-joystick";
 
 import initRAF from "../utils/RAF";
 import { App3d } from "./App3d";
+import { Howl } from "howler";
 
 export interface AssetConfig {
     name: string;
@@ -34,6 +35,15 @@ export interface FontsConfig {
         data: any;
     }[];
 }
+
+export interface SoundConfig {
+    name: string;
+    data: string;
+    volume: number;
+    loop: boolean;
+}
+
+export type SoundsConfig = SoundConfig[];
 
 export enum AppEvent {
     RENDER = "AppEvent.RENDER",
@@ -60,6 +70,7 @@ export class App extends utils.EventEmitter {
 
     protected _imageCache: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
     protected _texture2dCache: Map<string, Texture> = new Map<string, Texture>();
+    protected _soundCache: Map<string, Howl> = new Map<string, Howl>();
 
     protected _joystick!: Joystick;
     protected _stageHitArea!: Graphics;
@@ -247,6 +258,21 @@ export class App extends utils.EventEmitter {
                 const atlas = atlases[i];
 
                 BitmapFont.install(atlas.name, atlas.data);
+            }
+
+            resolve();
+        });
+    }
+
+    public async loadSounds(sounds: SoundsConfig): Promise<void> {
+        return new Promise((resolve) => {
+            for (let i = 0; i < sounds.length; i++) {
+                const sound = sounds[i];
+
+                this._soundCache.set(
+                    sound.name,
+                    new Howl({ src: [sound.data], volume: sound.volume, loop: sound.loop }),
+                );
             }
 
             resolve();
