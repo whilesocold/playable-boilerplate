@@ -311,6 +311,16 @@ export class App extends utils.EventEmitter {
         return this._texture2dCache.get(name);
     }
 
+    public playSound(name: string): Howl | undefined {
+        const sounds = this._soundCache.get(name);
+
+        if (sounds) {
+            sounds.play(name);
+        }
+
+        return sounds;
+    }
+
     public getSize(): { width: number; height: number } {
         return { width: this.getWidth(), height: this.getHeight() };
     }
