@@ -1,5 +1,16 @@
 import { MRAID, MRAIDEvent } from "./MRAID";
-import { AbstractRenderer, autoDetectRenderer, Container, Graphics, Renderer, Sprite, Texture, utils } from "pixi.js";
+import {
+    AbstractRenderer,
+    autoDetectRenderer,
+    BaseTexture,
+    Container,
+    Graphics,
+    Loader,
+    Renderer,
+    Sprite,
+    Texture,
+    utils,
+} from "pixi.js";
 import { Joystick } from "pixi-virtual-joystick";
 
 import initRAF from "../utils/RAF";
@@ -169,11 +180,15 @@ export class App extends utils.EventEmitter {
     }
 
     protected async loadTextureFromImage(
-        name: string,
-        type: string | undefined,
-        image: HTMLImageElement,
+      name: string,
+      type: string | undefined,
+      image: HTMLImageElement,
     ): Promise<void> {
-        // TODO: PIXI texture creation
+        switch (type) {
+            case "pixi":
+                this._texture2dCache.set(name, await Texture.from(image));
+                break;
+        }
     }
 
     protected async loadImages(images: AssetsConfig): Promise<void> {
@@ -182,9 +197,9 @@ export class App extends utils.EventEmitter {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-                name: string,
-                type: string | undefined,
-                image: HTMLImageElement | null,
+              name: string,
+              type: string | undefined,
+              image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
@@ -217,8 +232,8 @@ export class App extends utils.EventEmitter {
     protected onResize(): void {
         const { width, height } = this.getSize();
 
-        const upscaleWidth = Math.ceil(1.5 * width);
-        const upscaleHeight = Math.ceil(1.5 * height);
+        const upscaleWidth = Math.ceil(width);
+        const upscaleHeight = Math.ceil(height);
 
         this._renderer.view.style.width = width + "px";
         this._renderer.view.style.height = height + "px";
