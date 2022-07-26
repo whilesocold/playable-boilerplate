@@ -4,4 +4,3 @@ dist/*
 .cache
 .env
 .vendors
-.idea
