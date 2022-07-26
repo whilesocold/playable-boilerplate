@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { App } from "./App";
+import { LinearMipmapNearestFilter } from "three/src/constants";
 
 export enum MeshMaterialType {
     LAMBERT,
@@ -155,7 +156,7 @@ export class App3d extends App {
             case "three":
                 const texture = await textureLoader.loadAsync(image.src);
 
-                texture.magFilter = THREE.NearestFilter;
+                texture.magFilter = THREE.LinearFilter;
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.flipY = false;
