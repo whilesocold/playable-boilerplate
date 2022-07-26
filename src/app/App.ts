@@ -286,8 +286,8 @@ export class App extends utils.EventEmitter {
     protected onResize(): void {
         const { width, height } = this.getSize();
 
-        const upscaleWidth = Math.ceil(width);
-        const upscaleHeight = Math.ceil(height);
+        const upscaleWidth = Math.ceil(width) * 1.5;
+        const upscaleHeight = Math.ceil(height) * 1.5;
 
         this._renderer.view.style.width = width + "px";
         this._renderer.view.style.height = height + "px";
