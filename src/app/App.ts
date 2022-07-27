@@ -25,16 +25,12 @@ export interface AssetConfig {
 }
 export type AssetsConfig = AssetConfig[];
 
-export interface FontsConfig {
-    images: {
-        name: string;
-        data: string;
-    }[];
-    atlases: {
-        name: string;
-        data: any;
-    }[];
+export interface FontConfig {
+    name: string;
+    data: string;
+    scheme: string;
 }
+export type FontsConfig = FontConfig[];
 
 export interface SoundConfig {
     name: string;
@@ -250,17 +246,32 @@ export class App extends utils.EventEmitter {
 
     public async loadFonts(fonts: FontsConfig): Promise<void> {
         return new Promise(async (resolve) => {
-            await this.loadImages(fonts.images);
-
-            const atlases = fonts.atlases;
-
-            for (let i = 0; i < atlases.length; i++) {
-                const atlas = atlases[i];
-
-                BitmapFont.install(atlas.name, atlas.data);
+            if (!fonts.length) {
+                resolve();
             }
 
-            resolve();
+            let loadedCount = 0;
+
+            for (let i = 0; i < fonts.length; i++) {
+                const font = fonts[i];
+                const image = new Image();
+
+                image.onload = async () => {
+                    await this.loadTextureFromImage(font.name, "pixi", image);
+
+                    BitmapFont.install(font.scheme, this.getTexture2d(font.name) as any);
+
+                    if (++loadedCount === fonts.length) {
+                        resolve();
+                    }
+                };
+                image.onerror = () => {
+                    if (++loadedCount === fonts.length) {
+                        resolve();
+                    }
+                };
+                image.src = font.data;
+            }
         });
     }
 

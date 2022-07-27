@@ -3,7 +3,7 @@ import { getWindow } from "./getWindow";
 
 export function getLanguage(): string {
     const params = getWindow().params;
-    let language = getQueryLanguage() || "en";
+    let language = getQueryLanguage() ?? "en";
 
     if (!params.languages[language]) {
         if (language.indexOf("-") != -1) {
