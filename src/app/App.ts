@@ -1,17 +1,4 @@
-import { MRAID, MRAIDEvent } from "./MRAID";
-import {
-    AbstractRenderer,
-    autoDetectRenderer,
-    BaseTexture,
-    BitmapFont,
-    Container,
-    Graphics,
-    Loader,
-    Renderer,
-    Sprite,
-    Texture,
-    utils,
-} from "pixi.js";
+import { AbstractRenderer, autoDetectRenderer, BitmapFont, Container, Graphics, Texture, utils } from "pixi.js";
 import { Joystick } from "pixi-virtual-joystick";
 
 import initRAF from "../utils/RAF";
@@ -58,8 +45,6 @@ export class App extends utils.EventEmitter {
     protected _renderer!: AbstractRenderer;
     protected _stage!: Container;
 
-    protected _mraid!: MRAID;
-
     protected _renderHandler = -1;
     protected _tickCurrent = 0;
     protected _tickPrevious = 0;
@@ -83,8 +68,6 @@ export class App extends utils.EventEmitter {
 
     public async init(): Promise<void> {
         this.initRender();
-
-        await this.initMRAID();
 
         this.onResize();
         this.startTicker();
@@ -157,14 +140,6 @@ export class App extends utils.EventEmitter {
         this.initJoystick();
     }
 
-    protected async initMRAID(): Promise<void> {
-        return new Promise((resolve) => {
-            this._mraid = new MRAID();
-            this._mraid.once(MRAIDEvent.Complete, resolve);
-            this._mraid.init();
-        });
-    }
-
     protected startTicker(): void {
         this._renderHandler = window.requestAnimationFrame(this.onRequestAnimationFrame);
     }
@@ -195,9 +170,9 @@ export class App extends utils.EventEmitter {
     }
 
     protected async loadTextureFromImage(
-      name: string,
-      type: string | undefined,
-      image: HTMLImageElement,
+        name: string,
+        type: string | undefined,
+        image: HTMLImageElement,
     ): Promise<void> {
         switch (type) {
             case "pixi":
@@ -212,9 +187,9 @@ export class App extends utils.EventEmitter {
             const loadTotalIndex = images.length;
 
             const onLoad = async (
-              name: string,
-              type: string | undefined,
-              image: HTMLImageElement | null,
+                name: string,
+                type: string | undefined,
+                image: HTMLImageElement | null,
             ): Promise<void> => {
                 if (image) {
                     this._imageCache.set(name, image);
